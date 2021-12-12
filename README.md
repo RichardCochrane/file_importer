@@ -53,23 +53,23 @@ URL:
 #### Response (successful attempt)
 
 Status: 200
+
 Content: JSON structure:
+
     {
         "success": [True/False],
         "message": summary message,
         "errors": [a list of validation errors in the form: [row number, value, error description]]
     }
 
-    Success refers to the attempting to save data. if ignore_errors = Dalse (the default position),
-    then success will be Dalse as soon as there is one error. With ignore_errors = True, the import
-    service will attempt to import all valid transactions and return True if it doesn't encounter
-    any errors even if there weren't actually any valid transactions.
+Success refers to the attempting to save data. if ignore_errors = Dalse (the default position), then success will be Dalse as soon as there is one error. With ignore_errors = True, the import service will attempt to import all valid transactions and return True if it doesn't encounter any errors even if there weren't actually any valid transactions.
 
-    Errors will be a list of errors in validating the file whatever the value of ignore_errors.
+Errors will be a list of errors in validating the file whatever the value of ignore_errors.
 
 #### Response (invalid security hash)
 
 Status: 403
+
 Content: None
 
 
@@ -88,25 +88,29 @@ URL:
 #### Response (valid request)
 
 Status: 200
+
 Content: JSON structure:
+
     {
         'transactions': [list of transactions]
     }
 
-    Each transaction is a list with the following data:
-        [transaction date, country, currency, transaction type, net amount, VAT amount,
-         Net amount (EUR), VAT amount (EUR)]
+Each transaction is a list with the following data:
+    [transaction date, country, currency, transaction type, net amount, VAT amount, Net amount (EUR), VAT amount (EUR)]
 
 #### Response (invalid request)
 
 Status: 400
+
 Content: JSON structure:
+
     {'errors': [list of errors]}
 
 
 #### Response (invalid security hash)
 
 Status: 403
+
 Content: None
 
 
@@ -121,7 +125,7 @@ To prevent unauthorised use of the API and protect the integrity of our data, it
 
 Ideally, you want to be as permissable as you can be (accepting and working with quirks in the data) but you have to be careful not to get too clever, allowing users to submit any variety of sloppy data. I think it enforces a healthier API if the rules are rigid but clear.
 
-I think it's especially important not to start trying to handle edge cases manually, eg. if the API expects a row to say either "Purchase" or "Sale", then accepting a different casing or unnecessary white space may be deemed to be an acceptable compromise but catering for misspellings is a doomed path with every option have an almost limitless variety in possible misspellings, putting an excessive burden on the dev team to maintain a list of corrections, eg. co-ercing all "sele", "seel", "sell", "sales", "slaes", etc. as "Sale".
+I think it's especially important not to start trying to handle edge cases manually, eg. if the API expects a row to say either "Purchase" or "Sale", then accepting a different casing or unnecessary white space may be an acceptable compromise but catering for misspellings puts an excessive burden on the dev team to maintain a list of corrections, eg. co-ercing all "sele", "seel", "sell", "sales", "slaes", etc. as "Sale".
 
 Be rigid but also be clear about why the data is failing to validate.
 
@@ -130,14 +134,14 @@ Be rigid but also be clear about why the data is failing to validate.
 
 Certain tasks can be reasonably batched and separated but other tasks are better left either committing to a complete treatment or not.
 
-In this case, I though the initial saving of the data was an "all or nothing" approach - either all of the data should validate or none of it should. The pain to having to worry about a partially imported file and then trying to separate the imported rows from those that need to be fixed can be non-trivial. That said, for the sake of this test, this API will allow the importing of all valid rows and simply ignoring all invalid rows.
+In this case, I thought the initial saving of the data was an "all or nothing" approach - either all of the data should validate or none of it should. The pain to having to worry about a partially imported file and then trying to separate the imported rows from those that need to be fixed can be non-trivial. That said, for the sake of this test, this API will allow the importing of all valid rows and simply ignoring all invalid rows.
 
-In spite of that, the conversion of amounts to Euros can be done as a separate task. Because it depends on a matching country, a separate task will exist that will update all entries where possible. This separation allows us to expose another API route that will re-run just the amount conversions to Euros on all outstanding transactions, with time for the user to fix the entries that don't have countries usable by the conversion API.
+The conversion of amounts to Euros, however, can be done as a separate task. Because it depends on a matching currency, a separate task will update all entries where possible allowing the task to be run again when the matching data have improved.
 
 
 ### Financial Sensibilities
 
-Transactions can be either positive and negative reflecting incoming and outgoing money or balances. Whether an amount is considered positive or negative depends on context (bank balance, debtors, vat owed, etc) but for the sake of this test, Sales and VAT on Sales will be considered positive (income received) and Payments and VAT on Payments will be considered negative.
+Transactions can be either positive and negative reflecting incoming and outgoing cash flow. Whether an amount is considered positive or negative depends on context (bank balance, debtors, vat owed, etc) but for the sake of this test, Sales and VAT on Sales will be considered positive (income received) and Payments and VAT on Payments will be considered negative.
 
 
 ### Improvement Opportunities
