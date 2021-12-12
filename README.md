@@ -7,12 +7,17 @@ This package will allow you to accept an API request with transactional data and
 
 Run the installation file to set up the project:
 
+    ## Clone the repo
+    git clone git@github.com:RichardCochrane/file_importer.git
+
+    ## Install the actual app
     (from the root folder)
     ./scripts/install.sh
     cp dev.env .env
 
+    ## Get the database migrated to the latest schema
     (from the file_importer folder)
-    python manage.py migrate
+    ../venv/bin/python manage.py migrate
 
 
 ## Running the app
@@ -149,3 +154,20 @@ Transactions can be either positive and negative reflecting incoming and outgoin
 This test is by no means perfect but should hopefully show you what I can do. That said, where I'd take this further if it were to go into production:
 - Small refactoring of templates in the client - using the Django template inheritance structure is definitely preferred
 - Being able to download the list of query results (as csv or in excel format)
+- Automated tests should definitely be present in anything actually running in production
+
+
+## Scaling for Future Growth
+
+My separation of file import from Euro conversions would definitely help to allow scaling horizontally at either one of those parts without affecting the other. I have a basic chunking available, but commented out, that would commit the transactions in batches instead of individually. For the number of transactions here, commit invidual database inserts is feasible but dealing with millions of records would require optimisation in how the database connections are used.
+
+I would a NO-SQL databaes to cache the exchange rates so that it's only ever done once a day.
+
+
+## Screenshots
+
+The File Importer Client has a folder with [screenshots](https://github.com/RichardCochrane/file_importer_client/tree/main/screenshots) that show you HOW the pages should look, in the event that you are not able to run my code. I've cloned the repos and run through the installation twice so it should work and I'm happy to help fix any issues that arise when installing or running the apps.
+
+## An Apology
+
+I glossed over the requirement to use the Django REST framework, instead cobbling my own API. This was not intentional - I believe that using community-developed, well-trusted software, like the Django REST framework, is absolutely a better way to go over hand-coding your own solution but it was a detail I missed until it was too late to go back and rewrite the API to use it. That said, I hope that what I've done demonstrates mastery of this.
