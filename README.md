@@ -7,7 +7,19 @@ This package will allow you to accept an API request with transactional data and
 
 Run the installation file to set up the project:
 
+    (from the root folder)
     ./scripts/install.sh
+    cp dev.env .env
+
+    (from the file_importer folder)
+    python manage.py migrate
+
+
+## Running the app
+
+This app will run on port 8080 and can be run using the command:
+
+    ./run_server.sh
 
 
 ## API Calls
